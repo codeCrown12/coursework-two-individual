@@ -32,8 +32,8 @@ app.use(function(req, res, next){
 
 // Retrieve all lessons
 app.get('/getlessons', (req, res, next) => {
-    db.collection('activities').find({}).toArray((e, results) => {
-        if (e) return next(e)
+    db.collection('activities').find({}).toArray((err, results) => {
+        if (err) return next(err)
         res.send(results)
     })
 })
@@ -67,12 +67,11 @@ app.post("/addorder", (req, res, next) => {
 app.get("/getfilteredlessons", (req, res, next) => {
     let regex = new RegExp(req.query.filter,"i")
     let filter = {$or: [{title: regex}, {location: regex}]}
-    db.collection('activities').find(filter).toArray((e, results) => {
-        if (e) return next(e)
+    db.collection('activities').find(filter).toArray((err, results) => {
+        if (err) return next(err)
         res.send(results)
     })
 })
-
 
 
 // Static file middleware
