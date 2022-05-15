@@ -11,6 +11,9 @@ const ObjectID = require('mongodb').ObjectId;
 const url = "mongodb+srv://dbschoolhero:uJkTKLFBLIHB06xE@testcluster.l7oe0.mongodb.net/schoolherodb?retryWrites=true&w=majority";
 let db
 MongoClient.connect(url, (err, client) => {
+    if (err){
+        console.log(err)
+    }
     db = client.db()
 })
 
@@ -18,17 +21,13 @@ app.use(express.json())
 
 // Logging middleware
 app.use(function(req, res, next){
+    console.log("Request type: "+req.method)
     console.log("Request url: "+req.url)
     console.log("Request date: "+new Date())
     console.log("Request IP: "+req.ip)
     next()
 })
 
-
-// Entry point url
-app.get('/', (req, res, next) => {
-    res.send('MongoDB and Express coursework two')
-})
 
 // Retrieve all lessons
 app.get('/getlessons', (req, res, next) => {
@@ -38,16 +37,20 @@ app.get('/getlessons', (req, res, next) => {
     })
 })
 
+
 // Update lesson spaces
-app.put('/updatespaces/:id', (req, res, next) => {
-    let filter = { _id: new ObjectID(req.params.id) }
-    let new_value = { $set: req.body }
-    let options = { safe: true, multi: false }
-    db.collection('activities').update(filter, new_value, options, (err, result) => {
-        if (err) return next(err)
-        res.send({msg: "successfully updated"})
-    })
+app.put('/updatespaces', (req, res, next) => {
+    req.body.forEach(function(item) {
+        let filter = { _id: new ObjectID(item.id) }
+        let new_value = { $set: {spaces: item.spaces} }
+        let options = { safe: true, multi: false }
+        db.collection('activities').updateOne(filter, new_value, options, (err, result) => {
+            if (err) return next(err)
+        })
+    });
+    res.send({msg: "successfully updated"})
 })
+
 
 // Static file middleware
 app.use(function(req, res, next){
@@ -72,5 +75,6 @@ app.use(function(req, res){
 })
 
 
-
-app.listen(3000)
+app.listen(3000, () => {
+    console.log("Running on port 3000")
+})
