@@ -64,8 +64,8 @@ app.post("/addorder", (req, res, next) => {
 
 
 // Key up search
-app.get("/getfilteredlessons/:keyword", (req, res, next) => {
-    let regex = new RegExp(req.params.keyword,"i")
+app.get("/getfilteredlessons", (req, res, next) => {
+    let regex = new RegExp(req.query.filter,"i")
     let filter = {$or: [{title: regex}, {location: regex}]}
     db.collection('activities').find(filter).toArray((e, results) => {
         if (e) return next(e)
