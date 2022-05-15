@@ -19,6 +19,7 @@ MongoClient.connect(url, (err, client) => {
 
 app.use(express.json())
 
+
 // Logging middleware
 app.use(function(req, res, next){
     console.log("Request type: "+req.method)
@@ -40,7 +41,7 @@ app.get('/getlessons', (req, res, next) => {
 
 // Update lesson spaces
 app.put('/updatespaces', (req, res, next) => {
-    req.body.forEach(function(item) {
+    req.body.forEach((item) => {
         let filter = { _id: new ObjectID(item.id) }
         let new_value = { $set: {spaces: item.spaces} }
         let options = { safe: true, multi: false }
@@ -48,8 +49,18 @@ app.put('/updatespaces', (req, res, next) => {
             if (err) return next(err)
         })
     });
-    res.send({msg: "successfully updated"})
+    res.send({msg: "spaces successfully updated"})
 })
+
+
+// Add new order
+app.post("/addorder", (req, res, next) => {
+    let doc = req.body
+    db.collection('orders').insertOne(doc, (err, result) => {
+        if (err) return next(err)
+        res.send({msg: "order added successfully"})
+    })
+}) 
 
 
 // Static file middleware
