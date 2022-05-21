@@ -1,7 +1,7 @@
 var app = new Vue({
     el: "#app",
     data:{
-        lessons: lessons,
+        lessons: [],
         cart_items: [],
         order_details:{
             firstname: "",
@@ -13,34 +13,44 @@ var app = new Vue({
         attribute_sort: "title"
     },
     methods: {
+        
+        // Get image from server
+        getImageUrl: function(lesson){
+            let lessonStriped = lesson.split(" ").join("")
+            return `http://localhost:3000/static/${lessonStriped}.jpg` 
+        },
+        
         // Logic to add class activity to cart
         addToCart: function(lesson){
             if (lesson.spaces >= 1) {
                 // Update the DOM
                 lesson.spaces -= 1
                 //Add item to cart array
-                this.cart_items.push(lesson.id)
+                this.cart_items.push(lesson._id)
             }
             else{
                 lesson.spaces = 0
             }
         },
+        
         // Method to count items in the cart
         countCart: function(){
             return this.cart_items.length
         },
+        
         // Method to return information about the items in the cart
         cartItemsInfo: function(){
             let cart_items_modified = []
             for (let i = 0; i < this.cart_items.length; i++) {
                 for (let j = 0; j < this.lessons.length; j++) {
-                    if (this.lessons[j].id == this.cart_items[i]) {
+                    if (this.lessons[j]._id == this.cart_items[i]) {
                         cart_items_modified.push(this.lessons[j])
                     }   
                 }
             }
             return cart_items_modified
         },
+        
         // Logic to disable add to cart button if number of spaces reaches zero
         disableAddToCart: function(lesson){
             if (lesson.spaces >= 1){
@@ -48,6 +58,7 @@ var app = new Vue({
             }
             return true
         },
+        
         // Logic to disable art button if no items in the cart
         hideCart: function(){
             if (this.countCart() >= 1) {
@@ -55,6 +66,7 @@ var app = new Vue({
             }
             return true
         },
+        
         // Remove items from cart
         removeFromCart: function(id){
             for (let i = 0; i < this.lessons.length; i++) {
@@ -68,6 +80,7 @@ var app = new Vue({
                 }
             }
         },
+        
         // Get total price of items in the cart
         totalPrice: function(){
             let sum = 0
@@ -80,6 +93,7 @@ var app = new Vue({
             }
             return sum
         },
+        
         // Validate name and phone number check out fields
         validateFields: function(){
             if (/^[0-9]+$/.test(this.order_details.mobile) && /^[a-z]+$/i.test(this.order_details.firstname) && /^[a-z]+$/i.test(this.order_details.lastname)){
@@ -87,6 +101,7 @@ var app = new Vue({
             }
             return true
         },
+        
         // Checkout logic
         checkOut: function(){
             //Empty cart
@@ -104,11 +119,42 @@ var app = new Vue({
                 'success'
             )
         },
+
+        // Logic to fetch lists from server
+        fetchLessons: function(){
+            fetch(`http://localhost:3000/getlessons`)
+            .then(res => {
+                return res.json()
+            })
+            .then(data => {
+                this.lessons = data
+                console.log(this.lessons)
+            })
+            .catch(err => {
+                this.lessons = []
+                console.log(`unable to get lessons: ${err}`)
+            })
+        },
+
+        // Logic to call back end express filter logic
+        filterLessons: function(){
+            fetch(`http://localhost:3000/getfilteredlessons?filter=${this.search_keyword}`)
+            .then(res => {
+                return res.json()
+            })
+            .then(data => {
+                this.lessons = data
+                console.log(this.lessons)
+            })
+            .catch(err => {
+                this.lessons = []
+                console.log(`unable to get lessons: ${err}`)
+            })
+        },
+
         //Logic to filter results based on search keyword
-        filteredList: function(){
-            let newList = this.lessons.filter((lesson) => {
-                return lesson.title.toLowerCase().match(this.search_keyword) || lesson.location.toLowerCase().match(this.search_keyword)
-            });    
+        sortedList: function(){
+            let newList = this.lessons
             /** >>>>>>>>>>>>>> SORT BASED ON PROPERTY <<<<<<<<<<<<<<<<<< **/ 
             if (this.attribute_sort == "location") {
                 newList.sort(this.sortbyLocation)
@@ -129,6 +175,7 @@ var app = new Vue({
             }
             return newList
         },
+        
         /** Functions to sort based on various poperties **/
 
         // | >>>>>>>>>>> Sort by title/subject <<<<<<<<<<< | 
@@ -141,6 +188,7 @@ var app = new Vue({
             }
             return 0;
         },
+        
         // | >>>>>>>>>>> Sort by Location <<<<<<<<<<< | 
         sortbyLocation: function(a, b){
             if ( a.location.toLowerCase() < b.location.toLowerCase()){
@@ -151,13 +199,18 @@ var app = new Vue({
             }
             return 0;
         },
+        
         // | >>>>>>>>>>> Sort by price <<<<<<<<<<< | 
         sortbyPrice: function(a, b){
             return a.price-b.price;
         },
+        
         // | >>>>>>>>>>> Sort by spaces <<<<<<<<<<< | 
         sortbySpaces: function(a, b){
             return a.spaces-b.spaces;
         }
+    },
+    mounted() {
+        this.fetchLessons()
     }
 })

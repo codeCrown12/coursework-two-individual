@@ -34,6 +34,7 @@ app.use(function(req, res, next){
 app.get('/getlessons', (req, res, next) => {
     db.collection('activities').find({}).toArray((err, results) => {
         if (err) return next(err)
+        res.setHeader("Access-Control-Allow-Origin", req.headers.origin)
         res.send(results)
     })
 })
@@ -69,9 +70,11 @@ app.get("/getfilteredlessons", (req, res, next) => {
     let filter = {$or: [{title: regex}, {location: regex}]}
     db.collection('activities').find(filter).toArray((err, results) => {
         if (err) return next(err)
+        res.setHeader("Access-Control-Allow-Origin", req.headers.origin)
         res.send(results)
     })
 })
+
 
 
 // Static file middleware
