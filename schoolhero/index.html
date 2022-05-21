@@ -116,26 +116,26 @@
                             <div class="row">
                                 <h6>Cart Items</h6>
                                 <!-- No items in the cart error message -->
-                                <!-- <div v-if="cart_items.length < 1" class="row justify-content-center">
+                                <div v-if="countCart() < 1" class="row justify-content-center">
                                     <div class="col-sm-10">
                                         <p class="text-center m-0">
                                             <img style="width: 200px; object-fit: cover;" src="assets/images/Smiley face_Two Color.svg" alt="">
                                         </p>
                                         <p class="text-center m-0">No items in the cart</p>
                                     </div>
-                                </div> -->
-                                <!-- End of no items in the cart error message -->
+                                </div>
                                 <!-- Loop through cart items -->
-                                <!-- <div class="col-sm-6" v-for="item in cartItemsInfo()">
+                                <div class="col-sm-6" v-for="item in cartItemsInfo()">
                                     <div class="card mb-3 rounded-0">
                                         <div class="card-body">
                                             <h6 class="card-title">{{item.title}}</h6>
                                             <p class="card-text m-0"><strong>Location:</strong> {{item.location}}</p>
                                             <p class="card-text m-0"><strong>Price:</strong> $ {{item.price}}</p>
-                                            <button v-on:click="removeFromCart(item._id)" class="btn btn-sm btn-danger rounded-0 w-100">Remove from cart <i class="fas fa-cart-arrow-down"></i></button>
+                                            <p class="card-text m-0"><strong>Spaces:</strong> {{item.spaces}}</p>
+                                            <button v-on:click="removeFromCart(item)" class="btn mt-1 btn-sm btn-danger rounded-0 w-100">Remove from cart <i class="fas fa-cart-arrow-down"></i></button>
                                         </div>
                                     </div>
-                                </div> -->
+                                </div>
                             </div>
                           </div>
                           <!-- Check out form -->

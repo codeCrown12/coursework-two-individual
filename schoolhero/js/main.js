@@ -23,8 +23,29 @@ var app = new Vue({
         // Logic to add class activity to cart
         addToCart: function(lesson){
             if (lesson.spaces >= 1) {
+                let lessonInCart = false
+                if (this.countCart() >= 1){
+                    for (let i = 0; i < this.cart_items.length; i++) {
+                        if (this.cart_items[i].id == lesson._id){
+                            this.cart_items[i].spaces += 1
+                            lessonInCart = true
+                            break
+                        }
+                    }
+                    if (lessonInCart == false) {
+                        let item = {}
+                        item.id = lesson._id
+                        item.spaces = 1
+                        this.cart_items.push(item)
+                    }
+                }
+                else{
+                    let item = {}
+                    item.id = lesson._id
+                    item.spaces = 1
+                    this.cart_items.push(item)
+                }
                 lesson.spaces -= 1
-                this.cart_items.push(lesson._id)
             }
             else{
                 lesson.spaces = 0
@@ -39,6 +60,19 @@ var app = new Vue({
         // Method to return information about the items in the cart
         cartItemsInfo: function(){
             let cart_items_modified = []
+            for (let i = 0; i < this.cart_items.length; i++) {
+                for (let j = 0; j < this.lessons.length; j++) {
+                    if (this.lessons[j]._id == this.cart_items[i].id) {
+                        let item = {}
+                        item.id = this.cart_items[i].id
+                        item.title = this.lessons[j].title
+                        item.location = this.lessons[j].location
+                        item.price = this.lessons[j].price
+                        item.spaces = this.cart_items[i].spaces
+                        cart_items_modified.push(item)
+                    }   
+                }
+            }
             return cart_items_modified
         },
         
@@ -59,14 +93,11 @@ var app = new Vue({
         },
         
         // Remove items from cart
-        removeFromCart: function(id){
+        removeFromCart: function(item){
             for (let i = 0; i < this.lessons.length; i++) {
-                if (this.lessons[i]._id == id) {
-                    // add the space back to the stock
-                    this.lessons[i].spaces += 1
-                    // Find index of item in the cart array
-                    let item_index = this.cart_items.indexOf(id)
-                    //remove item from the cart array
+                if (this.lessons[i]._id == item.id) {
+                    this.lessons[i].spaces += item.spaces
+                    let item_index = this.cart_items.indexOf(item)
                     this.cart_items.splice(item_index, 1)     
                 }
             }
@@ -75,13 +106,6 @@ var app = new Vue({
         // Get total price of items in the cart
         totalPrice: function(){
             let sum = 0
-            for (let i = 0; i < this.cart_items.length; i++) {
-                for (let j = 0; j < this.lessons.length; j++) {
-                    if (this.lessons[j]._id == this.cart_items[i]) {
-                        sum += this.lessons[j].price
-                    }   
-                }
-            }
             return sum
         },
         
@@ -95,13 +119,6 @@ var app = new Vue({
         
         // Checkout logic
         checkOut: function(){
-            //Empty cart
-            this.cart_items = []
-
-            // Clear check out form fields
-            this.order_details.firstname = ""
-            this.order_details.lastname = ""
-            this.order_details.mobile = ""
             
             //Display message
             Swal.fire(
