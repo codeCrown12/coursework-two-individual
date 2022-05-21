@@ -9,8 +9,8 @@ var app = new Vue({
             mobile: "", 
         },
         search_keyword: "",
-        sort_order: "ascending",
-        attribute_sort: "title"
+        sort_order: "",
+        attribute_sort: ""
     },
     methods: {
         
@@ -23,9 +23,7 @@ var app = new Vue({
         // Logic to add class activity to cart
         addToCart: function(lesson){
             if (lesson.spaces >= 1) {
-                // Update the DOM
                 lesson.spaces -= 1
-                //Add item to cart array
                 this.cart_items.push(lesson._id)
             }
             else{
@@ -41,13 +39,6 @@ var app = new Vue({
         // Method to return information about the items in the cart
         cartItemsInfo: function(){
             let cart_items_modified = []
-            for (let i = 0; i < this.cart_items.length; i++) {
-                for (let j = 0; j < this.lessons.length; j++) {
-                    if (this.lessons[j]._id == this.cart_items[i]) {
-                        cart_items_modified.push(this.lessons[j])
-                    }   
-                }
-            }
             return cart_items_modified
         },
         
@@ -70,7 +61,7 @@ var app = new Vue({
         // Remove items from cart
         removeFromCart: function(id){
             for (let i = 0; i < this.lessons.length; i++) {
-                if (this.lessons[i].id == id) {
+                if (this.lessons[i]._id == id) {
                     // add the space back to the stock
                     this.lessons[i].spaces += 1
                     // Find index of item in the cart array
@@ -86,7 +77,7 @@ var app = new Vue({
             let sum = 0
             for (let i = 0; i < this.cart_items.length; i++) {
                 for (let j = 0; j < this.lessons.length; j++) {
-                    if (this.lessons[j].id == this.cart_items[i]) {
+                    if (this.lessons[j]._id == this.cart_items[i]) {
                         sum += this.lessons[j].price
                     }   
                 }
@@ -128,7 +119,6 @@ var app = new Vue({
             })
             .then(data => {
                 this.lessons = data
-                console.log(this.lessons)
             })
             .catch(err => {
                 this.lessons = []
@@ -144,7 +134,6 @@ var app = new Vue({
             })
             .then(data => {
                 this.lessons = data
-                console.log(this.lessons)
             })
             .catch(err => {
                 this.lessons = []
@@ -153,27 +142,25 @@ var app = new Vue({
         },
 
         //Logic to filter results based on search keyword
-        sortedList: function(){
-            let newList = this.lessons
+        sortList: function(){
             /** >>>>>>>>>>>>>> SORT BASED ON PROPERTY <<<<<<<<<<<<<<<<<< **/ 
             if (this.attribute_sort == "location") {
-                newList.sort(this.sortbyLocation)
+                this.lessons.sort(this.sortbyLocation)
             }
             else if (this.attribute_sort == "price"){
-                newList.sort(this.sortbyPrice)
+                this.lessons.sort(this.sortbyPrice)
             }
             else if (this.attribute_sort == "spaces"){
-                newList.sort(this.sortbySpaces)
+                this.lessons.sort(this.sortbySpaces)
             }
             else{
-                newList.sort(this.sortbyTitle)
+                this.lessons.sort(this.sortbyTitle)
             }
 
             /** >>>>>>>> SPECITY ORDER (ascending or descending) <<<<<<<< **/ 
-            if (this.sort_order != "ascending"){
-                return newList.reverse()
+            if (this.sort_order == "descending"){
+                this.lessons.reverse()
             }
-            return newList
         },
         
         /** Functions to sort based on various poperties **/
