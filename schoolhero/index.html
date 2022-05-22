@@ -132,7 +132,7 @@
                                             <p class="card-text m-0"><strong>Location:</strong> {{item.location}}</p>
                                             <p class="card-text m-0"><strong>Price:</strong> $ {{item.price}}</p>
                                             <p class="card-text m-0"><strong>Spaces:</strong> {{item.spaces}}</p>
-                                            <button v-on:click="removeFromCart(item)" class="btn mt-1 btn-sm btn-danger rounded-0 w-100">Remove from cart <i class="fas fa-cart-arrow-down"></i></button>
+                                            <button v-on:click="removeFromCart(item.id, item.spaces)" class="btn mt-1 btn-sm btn-danger rounded-0 w-100">Remove from cart <i class="fas fa-cart-arrow-down"></i></button>
                                         </div>
                                     </div>
                                 </div>

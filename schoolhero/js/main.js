@@ -59,7 +59,7 @@ var app = new Vue({
         
         // Method to return information about the items in the cart
         cartItemsInfo: function(){
-            let cart_items_modified = []
+            let cart_items_info = []
             for (let i = 0; i < this.cart_items.length; i++) {
                 for (let j = 0; j < this.lessons.length; j++) {
                     if (this.lessons[j]._id == this.cart_items[i].id) {
@@ -69,11 +69,11 @@ var app = new Vue({
                         item.location = this.lessons[j].location
                         item.price = this.lessons[j].price
                         item.spaces = this.cart_items[i].spaces
-                        cart_items_modified.push(item)
+                        cart_items_info.push(item)
                     }   
                 }
             }
-            return cart_items_modified
+            return cart_items_info
         },
         
         // Logic to disable add to cart button if number of spaces reaches zero
@@ -93,19 +93,32 @@ var app = new Vue({
         },
         
         // Remove items from cart
-        removeFromCart: function(item){
+        removeFromCart: function(id, spaces){
             for (let i = 0; i < this.lessons.length; i++) {
-                if (this.lessons[i]._id == item.id) {
-                    this.lessons[i].spaces += item.spaces
-                    let item_index = this.cart_items.indexOf(item)
-                    this.cart_items.splice(item_index, 1)     
+                if (this.lessons[i]._id == id) {
+                    this.lessons[i].spaces += spaces
                 }
             }
+            for (let i = 0; i < this.cart_items.length; i++) {
+                if (this.cart_items[i].id == id) {
+                    this.cart_items.splice(i, 1)
+                }
+            }
+            console.log(this.cart_items)
         },
         
         // Get total price of items in the cart
         totalPrice: function(){
             let sum = 0
+            for (let i = 0; i < this.cart_items.length; i++) {
+                for (let j = 0; j < this.lessons.length; j++) {
+                    if (this.cart_items[i].id == this.lessons[j]._id) {
+                        let item_price =  this.cart_items[i].spaces * this.lessons[j].price
+                        sum += item_price
+                    }      
+                }
+                
+            }
             return sum
         },
         
