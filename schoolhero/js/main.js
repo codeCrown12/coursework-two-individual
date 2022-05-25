@@ -117,7 +117,6 @@ var app = new Vue({
                         sum += item_price
                     }      
                 }
-                
             }
             return sum
         },
@@ -129,16 +128,71 @@ var app = new Vue({
             }
             return true
         },
+
+        // Clear checkout form on successful checkout
+        clearCheckoutForm: function(){
+            this.order_details.firstname = ""
+            this.order_details.lastname = ""
+            this.order_details.mobile = ""
+        },
         
         // Checkout logic
         checkOut: function(){
-            
-            //Display message
-            Swal.fire(
-                'Success!',
-                'Order submitted successfully!',
-                'success'
-            )
+            let order = {
+                name: this.order_details.firstname +' '+this.order_details.lastname,
+                phone_number: this.order_details.mobile,
+                items: this.cart_items
+            }
+            let order_string = (JSON.stringify(order))
+            fetch('http://localhost:3000/addorder', {
+                method: "POST",
+                body: order_string,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            .then(response => response.json())
+            .then(json_response => {
+                console.log(json_response)
+                this.updateSpaces()
+            })
+            .catch(err => console.log(err))
+        },
+
+        // Update spaces in db
+        updateSpaces: function(){
+            let spaces_upd = []
+            for (let i = 0; i < this.cart_items.length; i++) {
+                for (let j = 0; j < this.lessons.length; j++) {
+                    if (this.cart_items[i].id == this.lessons[j]._id) {
+                        let item = {
+                            id: this.cart_items[i].id,
+                            spaces: this.lessons[j].spaces
+                        }
+                        spaces_upd.push(item)
+                    }
+                }    
+            }
+            let spaces_upd_string = (JSON.stringify(spaces_upd ))
+            fetch('http://localhost:3000/updatespaces', {
+                method: "PUT",
+                body: spaces_upd_string,
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8"
+                }
+            })
+            .then(response => response.json())
+            .then(response => {
+                console.log(response)
+                this.cart_items = []
+                this.clearCheckoutForm()
+                Swal.fire(
+                    'Success!',
+                    'Order submitted successfully!',
+                    'success'
+                )
+            })
+            .catch(err => console.log(err))
         },
 
         // Logic to fetch lists from server

@@ -2,6 +2,7 @@
 const path = require('path')
 const fs = require('fs')
 const express = require('express')
+const cors = require('cors');
 const app = express()
 
 
@@ -18,6 +19,7 @@ MongoClient.connect(url, (err, client) => {
 })
 
 app.use(express.json())
+app.use(cors());
 
 
 // Logging middleware
@@ -34,7 +36,6 @@ app.use(function(req, res, next){
 app.get('/getlessons', (req, res, next) => {
     db.collection('activities').find({}).toArray((err, results) => {
         if (err) return next(err)
-        res.setHeader("Access-Control-Allow-Origin", req.headers.origin)
         res.send(results)
     })
 })
@@ -70,11 +71,9 @@ app.get("/getfilteredlessons", (req, res, next) => {
     let filter = {$or: [{title: regex}, {location: regex}]}
     db.collection('activities').find(filter).toArray((err, results) => {
         if (err) return next(err)
-        res.setHeader("Access-Control-Allow-Origin", req.headers.origin)
         res.send(results)
     })
 })
-
 
 
 // Static file middleware
@@ -99,7 +98,7 @@ app.use(function(req, res){
     res.send("file not found")
 })
 
-
-app.listen(3000, () => {
+const port = process.env.PORT || 3000
+app.listen(port, () => {
     console.log("Running on port 3000")
 })
