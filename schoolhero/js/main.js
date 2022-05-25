@@ -13,13 +13,6 @@ var app = new Vue({
         attribute_sort: ""
     },
     methods: {
-        
-        // Get image from server
-        getImageUrl: function(lesson){
-            let lessonStriped = lesson.split(" ").join("")
-            return `http://localhost:3000/static/${lessonStriped}.jpg` 
-        },
-        
         // Logic to add class activity to cart
         addToCart: function(lesson){
             if (lesson.spaces >= 1) {
@@ -68,6 +61,7 @@ var app = new Vue({
                         item.title = this.lessons[j].title
                         item.location = this.lessons[j].location
                         item.price = this.lessons[j].price
+                        item.url = this.lessons[j].url
                         item.spaces = this.cart_items[i].spaces
                         cart_items_info.push(item)
                     }   
@@ -224,7 +218,7 @@ var app = new Vue({
                 console.log(`unable to get lessons: ${err}`)
             })
         },
-
+        
         //Logic to filter results based on search keyword
         sortList: function(){
             /** >>>>>>>>>>>>>> SORT BASED ON PROPERTY <<<<<<<<<<<<<<<<<< **/ 
@@ -281,7 +275,7 @@ var app = new Vue({
             return a.spaces-b.spaces;
         }
     },
-    mounted() {
+    created() {
         this.fetchLessons()
     }
 })
