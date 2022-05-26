@@ -138,7 +138,7 @@ var app = new Vue({
                 items: this.cart_items
             }
             let order_string = (JSON.stringify(order))
-            fetch('http://localhost:3000/addorder', {
+            fetch('https://coursework-two-king.herokuapp.com/addorder', {
                 method: "POST",
                 body: order_string,
                 headers: {
@@ -168,7 +168,7 @@ var app = new Vue({
                 }    
             }
             let spaces_upd_string = (JSON.stringify(spaces_upd ))
-            fetch('http://localhost:3000/updatespaces', {
+            fetch('https://coursework-two-king.herokuapp.com/updatespaces', {
                 method: "PUT",
                 body: spaces_upd_string,
                 headers: {
@@ -191,7 +191,7 @@ var app = new Vue({
 
         // Logic to fetch lists from server
         fetchLessons: function(){
-            fetch(`http://localhost:3000/getlessons`)
+            fetch(`https://coursework-two-king.herokuapp.com/getlessons`)
             .then(res => {
                 return res.json()
             })
@@ -206,7 +206,7 @@ var app = new Vue({
 
         // Logic to call back end express filter logic
         filterLessons: function(){
-            fetch(`http://localhost:3000/getfilteredlessons?filter=${this.search_keyword}`)
+            fetch(`https://coursework-two-king.herokuapp.com/getfilteredlessons?filter=${this.search_keyword}`)
             .then(res => {
                 return res.json()
             })
