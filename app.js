@@ -64,7 +64,7 @@ app.put('/collection/:collectionName', (req, res, next) => {
 // Add new order
 app.post("/collection/:collectionName", (req, res, next) => {
     let doc = req.body
-    db.collection('orders').insertOne(doc, (err, result) => {
+    req.collection.insertOne(doc, (err, result) => {
         if (err) return next(err)
         res.send({msg: "order added successfully"})
     })
@@ -75,7 +75,7 @@ app.post("/collection/:collectionName", (req, res, next) => {
 app.get("/collection/:collectionName/search", (req, res, next) => {
     let regex = new RegExp(req.query.filter,"i")
     let filter = {$or: [{title: regex}, {location: regex}]}
-    db.collection('activities').find(filter).toArray((err, results) => {
+    req.collection.find(filter).toArray((err, results) => {
         if (err) return next(err)
         res.send(results)
     })
