@@ -21,6 +21,10 @@ MongoClient.connect(url, (err, client) => {
 app.use(express.json())
 app.use(cors());
 
+app.param('collectionName', (req, res, next, collectionName) => {
+    req.collection = db.collection(collectionName)
+    return next()
+})
 
 // Logging middleware
 app.use(function(req, res, next){
@@ -31,23 +35,25 @@ app.use(function(req, res, next){
     next()
 })
 
+app.get('/', (req, res, next) => {
+    res.send('Entry point URL')
+})
 
 // Retrieve all lessons
-app.get('/getlessons', (req, res, next) => {
-    db.collection('activities').find({}).toArray((err, results) => {
+app.get('/collection/:collectionName', (req, res, next) => {
+    req.collection.find({}).toArray((err, results) => {
         if (err) return next(err)
         res.send(results)
     })
 })
 
-
 // Update lesson spaces
-app.put('/updatespaces', (req, res, next) => {
+app.put('/collection/:collectionName', (req, res, next) => {
     req.body.forEach((item) => {
         let filter = { _id: new ObjectID(item.id) }
         let new_value = { $set: {spaces: item.spaces} }
         let options = { safe: true, multi: false }
-        db.collection('activities').updateOne(filter, new_value, options, (err, result) => {
+        req.collection.updateOne(filter, new_value, options, (err, result) => {
             if (err) return next(err)
         })
     });
@@ -56,7 +62,7 @@ app.put('/updatespaces', (req, res, next) => {
 
 
 // Add new order
-app.post("/addorder", (req, res, next) => {
+app.post("/collection/:collectionName", (req, res, next) => {
     let doc = req.body
     db.collection('orders').insertOne(doc, (err, result) => {
         if (err) return next(err)
@@ -66,7 +72,7 @@ app.post("/addorder", (req, res, next) => {
 
 
 // Key up search
-app.get("/getfilteredlessons", (req, res, next) => {
+app.get("/collection/:collectionName/search", (req, res, next) => {
     let regex = new RegExp(req.query.filter,"i")
     let filter = {$or: [{title: regex}, {location: regex}]}
     db.collection('activities').find(filter).toArray((err, results) => {
